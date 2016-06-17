@@ -15,5 +15,3 @@ def crawl():
 	parser.parse_scores()
 
 crawl()
-
-

@@ -51,6 +51,3 @@ class SuperPlacarParser():
 				continue
 			finally:
 				counter+=2
-			
-			
-		#print self.soup.find_all("div", { "class" : "team-score"} )[1]
