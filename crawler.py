@@ -1,7 +1,7 @@
 import urllib
+import time
 import sqlite3
 from html_parser import SuperPlacarParser
-
 
 def crawl():
     url = "http://www.superplacar.com.br"
@@ -11,5 +11,7 @@ def crawl():
     parser = SuperPlacarParser(content)
     parser.parse_scores()
 
-
-crawl()
+while True:
+    print "Crawling..."
+    crawl()
+    time.sleep(30)

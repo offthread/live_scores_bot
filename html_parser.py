@@ -10,10 +10,12 @@ class SuperPlacarParser():
         self.create_schema()
 
     def create_schema(self):
-        self.games_db = sqlite3.connect("games.db", check_same_thread=False)
+        self.games_db = sqlite3.connect("live_scores.db", check_same_thread=False)
         self.games_cur = self.games_db.cursor()
         self.games_cur.execute(
-            'CREATE TABLE IF NOT EXISTS game (match_day DATE, home_team_name TEXT, away_team_name TEXT, score TEXT, score_board_home TEXT, score_board_away TEXT, score_board_times_home TEXT, score_board_times_away TEXT, notify BOOLEAN, PRIMARY KEY (match_day, home_team_name, away_team_name))')
+            'CREATE TABLE IF NOT EXISTS game (match_day DATE, home_team_name TEXT, away_team_name TEXT, '
+            'score TEXT, score_board_home TEXT, score_board_away TEXT, score_board_times_home TEXT, score_board_times_away TEXT, '
+            'notify BOOLEAN, PRIMARY KEY (match_day, home_team_name, away_team_name))')
         self.games_db.commit()
 
         for row in self.games_cur.execute('SELECT * FROM game'):
@@ -89,10 +91,13 @@ class SuperPlacarParser():
                                    (today, team_home, team_away))
             current_game = self.games_cur.fetchone()
 
-            if current_game[3] != "%ix%i" % (score_home, score_away):
-                print "tem att"
+            if current_game[3] != "%ix%i" % (score_home, score_away) and \
+                    self.scorers_are_updated(score_home, score_away, scorers_home, scorers_away):
                 self.games_cur.execute(
                     "UPDATE game SET score=?, score_board_home=?, score_board_away=?, score_board_times_home=?, score_board_times_away=?, notify=? WHERE match_day=? AND home_team_name=? AND away_team_name=?",
                     ("%ix%i" % (score_home, score_away), ",".join(scorers_home), ",".join(scorers_away),
                      ",".join(scorers_home_time), ",".join(scorers_away_time), True, today, team_home, team_away))
                 self.games_db.commit()
+
+    def scorers_are_updated(self, score_home, score_away, scorers_home, scorers_away):
+        return len(scorers_home) == score_home and len(scorers_away) == score_away
