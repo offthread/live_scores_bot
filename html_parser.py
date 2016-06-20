@@ -18,8 +18,8 @@ class SuperPlacarParser():
             'notify BOOLEAN, PRIMARY KEY (match_day, home_team_name, away_team_name))')
         self.games_db.commit()
 
-        for row in self.games_cur.execute('SELECT * FROM game'):
-            print row
+        #for row in self.games_cur.execute('SELECT * FROM notification'):
+            #print row
 
     def parse_scores(self):
         counter = 0
