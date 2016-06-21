@@ -114,7 +114,7 @@ def help(msg):
                     "Message me with /addteam <team> to start to monitor the scores of this team,"
                     " /removeteam <team> to stop monitoring a team or /listtteams to check which teams"
                     " you're currently monitoring. In case of any issue please send an email to"
-                    " offthread@gmail.com. \n\nCreated by OFF Thread"
+                    " offthread@gmail.com. \n\nCreated by OFF Thread <offthread@gmail.com>"
                     )
 def tgram_bot():
     bot.message_loop(handle)
