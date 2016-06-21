@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from bs4 import BeautifulSoup
 import sqlite3
 import datetime
@@ -18,8 +21,8 @@ class SuperPlacarParser():
             'notify BOOLEAN, PRIMARY KEY (match_day, home_team_name, away_team_name))')
         self.games_db.commit()
 
-        #for row in self.games_cur.execute('SELECT * FROM notification'):
-            #print row
+        #for row in self.games_cur.execute('SELECT * FROM game'):
+        #    print row
 
     def parse_scores(self):
         counter = 0
@@ -29,7 +32,7 @@ class SuperPlacarParser():
                 scorers_home_time = []
 
                 scorers_tags = self.soup.find_all("div", {"class": "goal-scores"})[counter]
-                scorer_parser = BeautifulSoup("<html> " + str(scorers_tags) + " </html>", 'html.parser')
+                scorer_parser = BeautifulSoup("<html> " + scorers_tags.encode('latin-1').strip() + " </html>", 'html.parser')
 
                 for scorer in scorer_parser.find_all("span", {"class": "goal-player"}):
                     scorers_home.append(scorer.contents[0].strip())
@@ -41,7 +44,7 @@ class SuperPlacarParser():
                 scorers_away_time = []
 
                 scorers_tags = self.soup.find_all("div", {"class": "goal-scores"})[counter + 1]
-                scorer_parser = BeautifulSoup("<html> " + str(scorers_tags) + " </html>", 'html.parser')
+                scorer_parser = BeautifulSoup("<html> " + scorers_tags.encode('latin-1').strip() + " </html>", 'html.parser')
 
                 for scorer in scorer_parser.find_all("span", {"class": "goal-player"}):
                     scorers_away.append(scorer.contents[0].strip())
@@ -62,6 +65,7 @@ class SuperPlacarParser():
                 score_away = int(
                     self.soup.find_all("div", {"class": "team-score"})[counter + 1].contents[0].encode('utf-8')) if len(
                     self.soup.find_all("div", {"class": "team-score"})[counter + 1].contents) > 0 else None
+
 
                 if score_home != None and score_away != None:
                     self.insert_or_update_game_in_database(team_home, team_away, score_home, score_away, scorers_home,

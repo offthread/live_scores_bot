@@ -1,8 +1,12 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import telepot
 import sqlite3
 import threading
 import time
 import datetime
+import sys
 
 def handle(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
@@ -24,7 +28,8 @@ def add_team(msg):
 
     if len(requested_team) == 0:
         bot.sendMessage(msg['chat']['id'],
-                        "Please inform the team to be added to the watchlist",
+                        "Please inform the team to be added to the watchlist. Your team name must follow the nomenclature"
+                        " defined by http://www.superplacar.com.br",
                         reply_to_message_id=msg['message_id'])
 
     else:
@@ -170,11 +175,10 @@ def listenToUpdates():
 
             users_to_notify_for_home_team = notifications_cur.execute("SELECT * FROM notification WHERE team = ?",
                                                                       (home_team,)).fetchall()
-
             notified_users = []
             if len(users_to_notify_for_home_team) > 0:
-                notified_users.append(user)
                 for user in users_to_notify_for_home_team[0][1].split(","):
+                    notified_users.append(user)
                     if updates["started"]:
                         bot.sendMessage(user, "%s x %s has started. Scoreboard is 0x0!" % (home_team, away_team))
 
@@ -212,21 +216,25 @@ def listenToUpdates():
 
         time.sleep(30)
 
+if len(sys.argv) > 1:
+    notifications_db = sqlite3.connect("live_scores.db", check_same_thread=False)
+    notifications_cur = notifications_db.cursor()
 
-notifications_db = sqlite3.connect("live_scores.db", check_same_thread=False)
-notifications_cur = notifications_db.cursor()
+    notifications_cur.execute(
+        'CREATE TABLE IF NOT EXISTS notification (team TEXT, subscribed_users TEXT )')
 
-notifications_cur.execute(
-    'CREATE TABLE IF NOT EXISTS notification (team TEXT, subscribed_users TEXT )')
+    notifications_db.commit()
 
-notifications_db.commit()
+    bot = telepot.Bot(sys.argv[1])
 
-bot = telepot.Bot("206456023:AAGY7OKdMk54-Xpf8J0LNPNQAjuLOCVF788")
+    t = threading.Thread(target=tgram_bot)
+    t.daemon = True
+    t.start()
 
-t = threading.Thread(target=tgram_bot)
-t.daemon = True
-t.start()
+    print("I have successfully spun off the telegram bot")
 
-print("I have successfully spun off the telegram bot")
+    listenToUpdates()
 
-listenToUpdates()
+else:
+    print "usage: bot.py bot_key\n" \
+          "prog.py: error: the following arguments are required: bot_key"
