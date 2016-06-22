@@ -80,6 +80,9 @@ class SuperPlacarParser():
     def insert_or_update_game_in_database(self, team_home, team_away, score_home, score_away, scorers_home,
                                           scorers_away, scorers_home_time, scorers_away_time):
         dt = datetime.datetime.now()
+        if dt.hour ==  0:
+            dt = dt - datetime.timedelta(hours=1)
+
         today = datetime.date(dt.year, dt.month, dt.day)
 
         # If the game still doesn't exist on database, add it to the records
